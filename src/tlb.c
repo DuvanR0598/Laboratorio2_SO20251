@@ -10,6 +10,15 @@
     exit(EXIT_FAILURE);                                                        \
   } while (0)
 
+// Función principal del programa
+// Este programa mide el tiempo de acceso a la memoria al recorrer un arreglo
+// de enteros distribuidos en varias páginas de memoria. El tamaño de la página
+// se obtiene mediante la llamada a sysconf(_SC_PAGESIZE). El programa toma
+// como argumentos el número de páginas y el número de repeticiones. Luego,
+// calcula el tiempo promedio de acceso a la memoria y lo imprime en la salida
+// estándar.
+// El programa utiliza la función clock_gettime para medir el tiempo transcurrido
+// entre el inicio y el final del experimento. El tiempo se mide en nanosegundos.
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         fprintf(stderr, "Usage: %s pages trials\n", argv[0]);
@@ -24,13 +33,13 @@ int main(int argc, char *argv[]) {
     volatile int *a = calloc(pages * jump, sizeof(int));  // Asignar espacio para todas las páginas
     if (a == NULL) handle_error("calloc");
 
-    struct timespec start, end;
+    struct timespec start, end; // Estructura para almacenar el tiempo de inicio y fin 
 
     //Punto inicial de dedida de tiempo
     if (clock_gettime(CLOCK_MONOTONIC, &start) == -1) 
-        handle_error("clock_gettime");
+        handle_error("clock_gettime"); 
 
-    //Experimento
+    // Recorre el arreglo de enteros saltando entre páginas
     for (int j = 0; j < trials; j++) {
         for (int i = 0; i < pages * jump; i += jump) {
             a[i] += 1;
